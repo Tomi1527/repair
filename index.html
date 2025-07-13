@@ -2,19 +2,45 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>🔧 Reparaturkasten Rechner</title>
+  <title>Reparaturkasten Rechner</title>
   <style>
     body {
       background-color: #121212;
       color: #e0e0e0;
       font-family: 'Segoe UI', sans-serif;
       padding: 30px;
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
     }
-    h2 {
+    h1 {
       text-align: center;
       color: #00ffc8;
+    }
+    .tab {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .tab button {
+      background-color: #1e1e1e;
+      border: none;
+      color: #e0e0e0;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px;
+      margin: 0 5px;
+      transition: 0.3s ease;
+    }
+    .tab button.active {
+      background-color: #00ffc8;
+      color: #000;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
     }
     label {
       display: block;
@@ -30,7 +56,7 @@
       background-color: #1e1e1e;
       color: #ffffff;
     }
-    button {
+    button.calculate {
       width: 100%;
       padding: 12px;
       margin-top: 20px;
@@ -41,9 +67,6 @@
       border-radius: 10px;
       cursor: pointer;
       transition: 0.2s ease;
-    }
-    button:hover {
-      background-color: #00dab0;
     }
     .result {
       margin-top: 25px;
@@ -59,61 +82,109 @@
   </style>
 </head>
 <body>
-  <h2>🧰 Reparaturkasten Rechner</h2>
+  <h1>🧰 Reparaturkasten Rechner</h1>
 
-  <label for="kohle">Kohle:</label>
-  <input type="number" id="kohle" placeholder="z. B. 660" />
+  <div class="tab">
+    <button onclick="switchTab(0)" class="active">🔩 Mit Rohstoffen</button>
+    <button onclick="switchTab(1)">🧱 Mit Barren</button>
+  </div>
 
-  <label for="eisenerz">Eisenerz:</label>
-  <input type="number" id="eisenerz" placeholder="z. B. 100" />
+  <!-- Abschnitt 1: Ressourcen -->
+  <div class="section active" id="section-1">
+    <label for="kohle">Kohle:</label>
+    <input type="number" id="kohle" placeholder="z. B. 660" />
 
-  <label for="titanerz">Titanerz:</label>
-  <input type="number" id="titanerz" placeholder="z. B. 77" />
+    <label for="eisenerz">Eisenerz:</label>
+    <input type="number" id="eisenerz" placeholder="z. B. 100" />
 
-  <button onclick="berechne()">Berechnen</button>
+    <label for="titanerz">Titanerz:</label>
+    <input type="number" id="titanerz" placeholder="z. B. 77" />
 
-  <div class="result" id="ergebnis"></div>
+    <button class="calculate" onclick="rechner1()">Berechnen</button>
+    <div class="result" id="ergebnis1"></div>
+  </div>
+
+  <!-- Abschnitt 2: Barren -->
+  <div class="section" id="section-2">
+    <label for="stahl">Stahlbarren:</label>
+    <input type="number" id="stahl" placeholder="z. B. 10" />
+
+    <label for="titan">Titanbarren:</label>
+    <input type="number" id="titan" placeholder="z. B. 5" />
+
+    <button class="calculate" onclick="rechner2()">Berechnen</button>
+    <div class="result" id="ergebnis2"></div>
+  </div>
 
   <script>
-    function berechne() {
-      let kohle = parseInt(document.getElementById("kohle").value) || 0;
-      let eisen = parseInt(document.getElementById("eisenerz").value) || 0;
-      let titan = parseInt(document.getElementById("titanerz").value) || 0;
+    function switchTab(index) {
+      const tabs = document.querySelectorAll(".section");
+      const buttons = document.querySelectorAll(".tab button");
+      tabs.forEach((tab, i) => {
+        tab.classList.toggle("active", i === index);
+        buttons[i].classList.toggle("active", i === index);
+      });
+    }
 
-      const kohleProKasten = 50;
-      const eisenProKasten = 21;
-      const titanProKasten = 14;
+    function rechner1() {
+      const kohle = parseInt(document.getElementById("kohle").value) || 0;
+      const eisen = parseInt(document.getElementById("eisenerz").value) || 0;
+      const titan = parseInt(document.getElementById("titanerz").value) || 0;
 
-      let maxKohle = Math.floor(kohle / kohleProKasten);
-      let maxEisen = Math.floor(eisen / eisenProKasten);
-      let maxTitan = Math.floor(titan / titanProKasten);
+      const kohleProStahl = 10, eisenProStahl = 7;
+      const kohleProTitan = 10, titanErzProTitan = 7;
 
-      let kistenMöglich = Math.min(maxKohle, maxEisen, maxTitan);
+      const stahlMöglich = Math.min(
+        Math.floor(kohle / kohleProStahl),
+        Math.floor(eisen / eisenProStahl)
+      );
+      const titanMöglich = Math.min(
+        Math.floor(kohle / kohleProTitan),
+        Math.floor(titan / titanErzProTitan)
+      );
 
-      let result = "";
+      const maxKisten = Math.min(
+        Math.floor(stahlMöglich / 3),
+        Math.floor(titanMöglich / 2)
+      );
 
-      if (kohle === 0 && eisen === 0 && titan === 0) {
-        result = "Bitte gib mindestens einen Wert ein.";
-      } else if (kohle > 0 && eisen === 0 && titan === 0) {
-        let maxKisten = Math.floor(kohle / kohleProKasten);
-        result = `<p>🔎 Du hast nur <span class="highlight">${kohle} Kohle</span>.</p>`;
-        result += `<p>Damit kannst du maximal <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>`;
-        result += `<p>Dafür brauchst du:</p>`;
-        result += `<ul>
-          <li><span class="highlight">${maxKisten * eisenProKasten}</span> Eisenerz</li>
-          <li><span class="highlight">${maxKisten * titanProKasten}</span> Titanerz</li>
-        </ul>`;
-      } else {
-        result = `<p>✅ Du kannst <span class="highlight">${kistenMöglich}</span> Reparaturkästen herstellen.</p>`;
-        result += `<p>📦 Benötigte Ressourcen:</p>`;
-        result += `<ul>
-          <li>Kohle: <span class="highlight">${kistenMöglich * kohleProKasten}</span> (Verbleibend: ${kohle - kistenMöglich * kohleProKasten})</li>
-          <li>Eisenerz: <span class="highlight">${kistenMöglich * eisenProKasten}</span> (Verbleibend: ${eisen - kistenMöglich * eisenProKasten})</li>
-          <li>Titanerz: <span class="highlight">${kistenMöglich * titanProKasten}</span> (Verbleibend: ${titan - kistenMöglich * titanProKasten})</li>
-        </ul>`;
-      }
+      const kohleGesamt = (maxKisten * 3 * kohleProStahl) + (maxKisten * 2 * kohleProTitan);
+      const eisenGesamt = maxKisten * 3 * eisenProStahl;
+      const titanGesamt = maxKisten * 2 * titanErzProTitan;
 
-      document.getElementById("ergebnis").innerHTML = result;
+      document.getElementById("ergebnis1").innerHTML = `
+        <p>🔧 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>
+        <p>➡️ Dafür brauchst du:</p>
+        <ul>
+          <li>Kohle: <span class="highlight">${kohleGesamt}</span></li>
+          <li>Eisenerz: <span class="highlight">${eisenGesamt}</span></li>
+          <li>Titanerz: <span class="highlight">${titanGesamt}</span></li>
+        </ul>
+        <p>📦 Benötigt: <span class="highlight">${maxKisten * 3}</span> Stahlbarren und <span class="highlight">${maxKisten * 2}</span> Titanbarren</p>
+      `;
+    }
+
+    function rechner2() {
+      const stahl = parseInt(document.getElementById("stahl").value) || 0;
+      const titan = parseInt(document.getElementById("titan").value) || 0;
+
+      const maxKisten = Math.min(
+        Math.floor(stahl / 3),
+        Math.floor(titan / 2)
+      );
+
+      const kohleFürStahl = maxKisten * 3 * 10;
+      const kohleFürTitan = maxKisten * 2 * 10;
+
+      document.getElementById("ergebnis2").innerHTML = `
+        <p>🧱 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>
+        <p>🪵 Dafür hättest du ursprünglich gebraucht:</p>
+        <ul>
+          <li>Kohle: <span class="highlight">${kohleFürStahl + kohleFürTitan}</span> (für Barren)</li>
+          <li>Eisenerz: <span class="highlight">${maxKisten * 3 * 7}</span></li>
+          <li>Titanerz: <span class="highlight">${maxKisten * 2 * 7}</span></li>
+        </ul>
+      `;
     }
   </script>
 </body>
