@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔧 Reparaturkasten Rechner</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+      max-width: 500px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      color: #00ffc8;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: none;
+      background-color: #1e1e1e;
+      color: #ffffff;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background-color: #00ffc8;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    button:hover {
+      background-color: #00dab0;
+    }
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00ffc850;
+    }
+    .highlight {
+      color: #00ffc8;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>🧰 Reparaturkasten Rechner</h2>
+
+  <label for="kohle">Kohle:</label>
+  <input type="number" id="kohle" placeholder="z. B. 660" />
+
+  <label for="eisenerz">Eisenerz:</label>
+  <input type="number" id="eisenerz" placeholder="z. B. 100" />
+
+  <label for="titanerz">Titanerz:</label>
+  <input type="number" id="titanerz" placeholder="z. B. 77" />
+
+  <button onclick="berechne()">Berechnen</button>
+
+  <div class="result" id="ergebnis"></div>
+
+  <script>
+    function berechne() {
+      let kohle = parseInt(document.getElementById("kohle").value) || 0;
+      let eisen = parseInt(document.getElementById("eisenerz").value) || 0;
+      let titan = parseInt(document.getElementById("titanerz").value) || 0;
+
+      const kohleProKasten = 50;
+      const eisenProKasten = 21;
+      const titanProKasten = 14;
+
+      let maxKohle = Math.floor(kohle / kohleProKasten);
+      let maxEisen = Math.floor(eisen / eisenProKasten);
+      let maxTitan = Math.floor(titan / titanProKasten);
+
+      let kistenMöglich = Math.min(maxKohle, maxEisen, maxTitan);
+
+      let result = "";
+
+      if (kohle === 0 && eisen === 0 && titan === 0) {
+        result = "Bitte gib mindestens einen Wert ein.";
+      } else if (kohle > 0 && eisen === 0 && titan === 0) {
+        let maxKisten = Math.floor(kohle / kohleProKasten);
+        result = `<p>🔎 Du hast nur <span class="highlight">${kohle} Kohle</span>.</p>`;
+        result += `<p>Damit kannst du maximal <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>`;
+        result += `<p>Dafür brauchst du:</p>`;
+        result += `<ul>
+          <li><span class="highlight">${maxKisten * eisenProKasten}</span> Eisenerz</li>
+          <li><span class="highlight">${maxKisten * titanProKasten}</span> Titanerz</li>
+        </ul>`;
+      } else {
+        result = `<p>✅ Du kannst <span class="highlight">${kistenMöglich}</span> Reparaturkästen herstellen.</p>`;
+        result += `<p>📦 Benötigte Ressourcen:</p>`;
+        result += `<ul>
+          <li>Kohle: <span class="highlight">${kistenMöglich * kohleProKasten}</span> (Verbleibend: ${kohle - kistenMöglich * kohleProKasten})</li>
+          <li>Eisenerz: <span class="highlight">${kistenMöglich * eisenProKasten}</span> (Verbleibend: ${eisen - kistenMöglich * eisenProKasten})</li>
+          <li>Titanerz: <span class="highlight">${kistenMöglich * titanProKasten}</span> (Verbleibend: ${titan - kistenMöglich * titanProKasten})</li>
+        </ul>`;
+      }
+
+      document.getElementById("ergebnis").innerHTML = result;
+    }
+  </script>
+</body>
+</html>
