@@ -100,6 +100,9 @@
     <label for="titanerz">Titanerz:</label>
     <input type="number" id="titanerz" placeholder="z. B. 77" />
 
+    <label for="wunschkisten">Wie viele Reparaturkästen willst du? (optional):</label>
+    <input type="number" id="wunschkisten" placeholder="z. B. 5" />
+
     <button class="calculate" onclick="rechner1()">Berechnen</button>
     <div class="result" id="ergebnis1"></div>
   </div>
@@ -111,6 +114,9 @@
 
     <label for="titan">Titanbarren:</label>
     <input type="number" id="titan" placeholder="z. B. 5" />
+
+    <label for="wunschkisten2">Wie viele Reparaturkästen willst du? (optional):</label>
+    <input type="number" id="wunschkisten2" placeholder="z. B. 5" />
 
     <button class="calculate" onclick="rechner2()">Berechnen</button>
     <div class="result" id="ergebnis2"></div>
@@ -130,61 +136,65 @@
       const kohle = parseInt(document.getElementById("kohle").value) || 0;
       const eisen = parseInt(document.getElementById("eisenerz").value) || 0;
       const titan = parseInt(document.getElementById("titanerz").value) || 0;
+      const wunsch = parseInt(document.getElementById("wunschkisten").value);
 
       const kohleProStahl = 10, eisenProStahl = 7;
       const kohleProTitan = 10, titanErzProTitan = 7;
 
-      const stahlMöglich = Math.min(
-        Math.floor(kohle / kohleProStahl),
-        Math.floor(eisen / eisenProStahl)
-      );
-      const titanMöglich = Math.min(
-        Math.floor(kohle / kohleProTitan),
-        Math.floor(titan / titanErzProTitan)
-      );
+      const stahlMax = Math.min(Math.floor(kohle / kohleProStahl), Math.floor(eisen / eisenProStahl));
+      const titanMax = Math.min(Math.floor(kohle / kohleProTitan), Math.floor(titan / titanErzProTitan));
+      const maxKisten = Math.min(Math.floor(stahlMax / 3), Math.floor(titanMax / 2));
 
-      const maxKisten = Math.min(
-        Math.floor(stahlMöglich / 3),
-        Math.floor(titanMöglich / 2)
-      );
+      let output = `<p>🔧 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>`;
 
-      const kohleGesamt = (maxKisten * 3 * kohleProStahl) + (maxKisten * 2 * kohleProTitan);
-      const eisenGesamt = maxKisten * 3 * eisenProStahl;
-      const titanGesamt = maxKisten * 2 * titanErzProTitan;
+      if (wunsch && wunsch > 0) {
+        const kohleGesamt = (wunsch * 3 * kohleProStahl) + (wunsch * 2 * kohleProTitan);
+        const eisenGesamt = wunsch * 3 * eisenProStahl;
+        const titanGesamt = wunsch * 2 * titanErzProTitan;
+        const reicht = (wunsch <= maxKisten);
 
-      document.getElementById("ergebnis1").innerHTML = `
-        <p>🔧 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>
-        <p>➡️ Dafür brauchst du:</p>
-        <ul>
-          <li>Kohle: <span class="highlight">${kohleGesamt}</span></li>
-          <li>Eisenerz: <span class="highlight">${eisenGesamt}</span></li>
-          <li>Titanerz: <span class="highlight">${titanGesamt}</span></li>
-        </ul>
-        <p>📦 Benötigt: <span class="highlight">${maxKisten * 3}</span> Stahlbarren und <span class="highlight">${maxKisten * 2}</span> Titanbarren</p>
-      `;
+        output += `
+          <p>🧾 Um <span class="highlight">${wunsch}</span> Kästen herzustellen brauchst du:</p>
+          <ul>
+            <li>Kohle: <span class="highlight">${kohleGesamt}</span></li>
+            <li>Eisenerz: <span class="highlight">${eisenGesamt}</span></li>
+            <li>Titanerz: <span class="highlight">${titanGesamt}</span></li>
+          </ul>
+          <p>${reicht ? "✅ Du hast genug Ressourcen!" : "❌ Du hast nicht genug Ressourcen."}</p>
+        `;
+      }
+
+      document.getElementById("ergebnis1").innerHTML = output;
     }
 
     function rechner2() {
       const stahl = parseInt(document.getElementById("stahl").value) || 0;
       const titan = parseInt(document.getElementById("titan").value) || 0;
+      const wunsch = parseInt(document.getElementById("wunschkisten2").value);
 
-      const maxKisten = Math.min(
-        Math.floor(stahl / 3),
-        Math.floor(titan / 2)
-      );
+      const maxKisten = Math.min(Math.floor(stahl / 3), Math.floor(titan / 2));
+      let output = `<p>🧱 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>`;
 
-      const kohleFürStahl = maxKisten * 3 * 10;
-      const kohleFürTitan = maxKisten * 2 * 10;
+      if (wunsch && wunsch > 0) {
+        const reicht = wunsch <= maxKisten;
+        const kohleFürStahl = wunsch * 3 * 10;
+        const kohleFürTitan = wunsch * 2 * 10;
+        const eisen = wunsch * 3 * 7;
+        const titanErz = wunsch * 2 * 7;
 
-      document.getElementById("ergebnis2").innerHTML = `
-        <p>🧱 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>
-        <p>🪵 Dafür hättest du ursprünglich gebraucht:</p>
-        <ul>
-          <li>Kohle: <span class="highlight">${kohleFürStahl + kohleFürTitan}</span> (für Barren)</li>
-          <li>Eisenerz: <span class="highlight">${maxKisten * 3 * 7}</span></li>
-          <li>Titanerz: <span class="highlight">${maxKisten * 2 * 7}</span></li>
-        </ul>
-      `;
+        output += `
+          <p>🧾 Für <span class="highlight">${wunsch}</span> Kästen brauchst du ursprünglich:</p>
+          <ul>
+            <li>Stahlbarren: ${wunsch * 3}, Titanbarren: ${wunsch * 2}</li>
+            <li>Kohle: <span class="highlight">${kohleFürStahl + kohleFürTitan}</span></li>
+            <li>Eisenerz: <span class="highlight">${eisen}</span></li>
+            <li>Titanerz: <span class="highlight">${titanErz}</span></li>
+          </ul>
+          <p>${reicht ? "✅ Du hast genug Barren!" : "❌ Nicht genug Barren vorhanden."}</p>
+        `;
+      }
+
+      document.getElementById("ergebnis2").innerHTML = output;
     }
   </script>
 </body>
