@@ -79,6 +79,10 @@
       color: #00ffc8;
       font-weight: bold;
     }
+    ul {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
   </style>
 </head>
 <body>
@@ -132,50 +136,46 @@
       });
     }
 
-function rechner1() {
-  const kohle = parseInt(document.getElementById("kohle").value) || 0;
-  const eisen = parseInt(document.getElementById("eisenerz").value) || 0;
-  const titan = parseInt(document.getElementById("titanerz").value) || 0;
-  const wunsch = parseInt(document.getElementById("wunschkisten").value);
+    function rechner1() {
+      const kohle = parseInt(document.getElementById("kohle").value) || 0;
+      const eisen = parseInt(document.getElementById("eisenerz").value) || 0;
+      const titan = parseInt(document.getElementById("titanerz").value) || 0;
+      const wunsch = parseInt(document.getElementById("wunschkisten").value);
 
-  const kohleProStahl = 10, eisenProStahl = 7;
-  const kohleProTitan = 10, titanErzProTitan = 7;
+      const kohleProStahl = 10, eisenProStahl = 7;
+      const kohleProTitan = 10, titanErzProTitan = 7;
 
-  const stahlMax = Math.min(Math.floor(kohle / kohleProStahl), Math.floor(eisen / eisenProStahl));
-  const titanMax = Math.min(Math.floor(kohle / kohleProTitan), Math.floor(titan / titanErzProTitan));
-  const maxKisten = Math.min(Math.floor(stahlMax / 3), Math.floor(titanMax / 2));
+      const stahlMax = Math.min(Math.floor(kohle / kohleProStahl), Math.floor(eisen / eisenProStahl));
+      const titanMax = Math.min(Math.floor(kohle / kohleProTitan), Math.floor(titan / titanErzProTitan));
+      const maxKisten = Math.min(Math.floor(stahlMax / 3), Math.floor(titanMax / 2));
 
-  let output = `<p>🔧 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>`;
+      let output = `<p>🔧 Du kannst <span class="highlight">${maxKisten}</span> Reparaturkästen herstellen.</p>`;
 
-  // Neue Anzeige: Ressourcenbedarf für alle Barren
-  output += `
-    <p>🧱 Du kannst maximal:</p>
-    <ul>
-      <li><span class="highlight">${stahlMax}</span> Stahlbarren → braucht <span class="highlight">${stahlMax * kohleProStahl}</span> Kohle & <span class="highlight">${stahlMax * eisenProStahl}</span> Eisenerz</li>
-      <li><span class="highlight">${titanMax}</span> Titanbarren → braucht <span class="highlight">${titanMax * kohleProTitan}</span> Kohle & <span class="highlight">${titanMax * titanErzProTitan}</span> Titanerz</li>
-    </ul>
-  `;
+      // Neue Anzeige: Ressourcenbedarf für alle Barren
+      output += `
+        <p>🧱 Du kannst maximal:</p>
+        <ul>
+          <li><span class="highlight">${stahlMax}</span> Stahlbarren → braucht <span class="highlight">${stahlMax * kohleProStahl}</span> Kohle & <span class="highlight">${stahlMax * eisenProStahl}</span> Eisenerz</li>
+          <li><span class="highlight">${titanMax}</span> Titanbarren → braucht <span class="highlight">${titanMax * kohleProTitan}</span> Kohle & <span class="highlight">${titanMax * titanErzProTitan}</span> Titanerz</li>
+        </ul>
+      `;
 
-  if (wunsch && wunsch > 0) {
-    const kohleGesamt = (wunsch * 3 * kohleProStahl) + (wunsch * 2 * kohleProTitan);
-    const eisenGesamt = wunsch * 3 * eisenProStahl;
-    const titanGesamt = wunsch * 2 * titanErzProTitan;
-    const reicht = (wunsch <= maxKisten);
+      if (wunsch && wunsch > 0) {
+        const kohleGesamt = (wunsch * 3 * kohleProStahl) + (wunsch * 2 * kohleProTitan);
+        const eisenGesamt = wunsch * 3 * eisenProStahl;
+        const titanGesamt = wunsch * 2 * titanErzProTitan;
+        const reicht = (wunsch <= maxKisten);
 
-    output += `
-      <p>🧾 Für <span class="highlight">${wunsch}</span> Reparaturkästen brauchst du:</p>
-      <ul>
-        <li>Kohle: <span class="highlight">${kohleGesamt}</span></li>
-        <li>Eisenerz: <span class="highlight">${eisenGesamt}</span></li>
-        <li>Titanerz: <span class="highlight">${titanGesamt}</span></li>
-      </ul>
-      <p>${reicht ? "✅ Du hast genug Ressourcen!" : "❌ Du hast nicht genug Ressourcen."}</p>
-    `;
-  }
-
-  document.getElementById("ergebnis1").innerHTML = output;
-}
-
+        output += `
+          <p>🧾 Für <span class="highlight">${wunsch}</span> Reparaturkästen brauchst du:</p>
+          <ul>
+            <li>Kohle: <span class="highlight">${kohleGesamt}</span></li>
+            <li>Eisenerz: <span class="highlight">${eisenGesamt}</span></li>
+            <li>Titanerz: <span class="highlight">${titanGesamt}</span></li>
+          </ul>
+          <p>${reicht ? "✅ Du hast genug Ressourcen!" : "❌ Du hast nicht genug Ressourcen."}</p>
+        `;
+      }
 
       document.getElementById("ergebnis1").innerHTML = output;
     }
